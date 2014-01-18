@@ -13,9 +13,7 @@ type Builder struct {
 
 var emptyBuilderValue = reflect.ValueOf(Builder{ps.NewMap()})
 
-type any interface{}
-
-func getBuilderMap(builder any) ps.Map {
+func getBuilderMap(builder interface{}) ps.Map {
 	b := mirror.Convert(builder, Builder{}).(Builder)
 
 	if b.builderMap == nil {
@@ -25,16 +23,16 @@ func getBuilderMap(builder any) ps.Map {
 	return b.builderMap
 }
 
-func Set(builder any, name string, val any) any {
+func Set(builder interface{}, name string, val interface{}) interface{} {
 	b := Builder{getBuilderMap(builder).Set(name, val)}
 	return mirror.Convert(b, builder)
 }
 
-func Append(builder any, name string, vals ...any) any {
+func Append(builder interface{}, name string, vals ...interface{}) interface{} {
 	return Extend(builder, name, vals)
 }
 
-func Extend(builder any, name string, vals any) any {
+func Extend(builder interface{}, name string, vals interface{}) interface{} {
 	maybeList, ok := getBuilderMap(builder).Lookup(name)
 
 	var list ps.List
@@ -65,7 +63,7 @@ func listToSlice(list ps.List, arrayType reflect.Type) reflect.Value {
 
 var anyArrayType = reflect.TypeOf([]interface{}{})
 
-func Get(builder any, name string) (any, bool) {
+func Get(builder interface{}, name string) (interface{}, bool) {
 	val, ok := getBuilderMap(builder).Lookup(name)
 	if !ok {
 		return nil, false
@@ -91,7 +89,7 @@ func Get(builder any, name string) (any, bool) {
 	return val, true
 }
 
-func GetStruct(builder any) any {
+func GetStruct(builder interface{}) interface{} {
 	structVal := newBuilderStruct(reflect.TypeOf(builder))
 	if structVal == nil {
 		return nil

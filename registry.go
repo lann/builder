@@ -4,7 +4,7 @@ import "reflect"
 
 var registry = make(map[reflect.Type]reflect.Type)
 
-func Register(builderProto interface{}, structProto interface{}) any {
+func Register(builderProto interface{}, structProto interface{}) interface{} {
 	empty := RegisterType(
 		reflect.TypeOf(builderProto),
 		reflect.TypeOf(structProto),
