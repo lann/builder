@@ -3,6 +3,7 @@ package builder
 import (
 	"go/ast"
 	"reflect"
+	"github.com/lann/mirror"
 	"github.com/mndrix/ps"
 )
 
@@ -10,16 +11,12 @@ type Builder struct {
 	builderMap ps.Map
 }
 
-var emptyBuilder = Builder{ps.NewMap()}
+var emptyBuilderValue = reflect.ValueOf(Builder{ps.NewMap()})
 
 type any interface{}
 
-func reflectConvert(val any, toType reflect.Type) any {
-	return reflect.ValueOf(val).Convert(toType).Interface()
-}
-
 func getBuilderMap(builder any) ps.Map {
-	b := reflectConvert(builder, reflect.TypeOf(Builder{})).(Builder)
+	b := mirror.Convert(builder, Builder{}).(Builder)
 
 	if b.builderMap == nil {
 		return ps.NewMap()
@@ -30,10 +27,14 @@ func getBuilderMap(builder any) ps.Map {
 
 func Set(builder any, name string, val any) any {
 	b := Builder{getBuilderMap(builder).Set(name, val)}
-	return reflectConvert(b, reflect.TypeOf(builder))
+	return mirror.Convert(b, builder)
 }
 
 func Append(builder any, name string, vals ...any) any {
+	return Extend(builder, name, vals)
+}
+
+func Extend(builder any, name string, vals any) any {
 	maybeList, ok := getBuilderMap(builder).Lookup(name)
 
 	var list ps.List
@@ -44,9 +45,10 @@ func Append(builder any, name string, vals ...any) any {
 		list = ps.NewList()
 	}
 
-	for _, val := range vals {
+	mirror.ForEach(vals, func(_ int, val interface{}) {
 		list = list.Cons(val)
-	}
+	})
+
 	return Set(builder, name, list)
 }
 

@@ -1,8 +1,6 @@
 package builder
 
-import (
-	"reflect"
-)
+import "reflect"
 
 var registry = make(map[reflect.Type]reflect.Type)
 
@@ -17,7 +15,7 @@ func Register(builderProto interface{}, structProto interface{}) any {
 func RegisterType(builderType reflect.Type, structType reflect.Type) *reflect.Value {
 	structType.NumField() // Panic if structType is not a struct
 	registry[builderType] = structType
-	emptyValue := reflect.ValueOf(emptyBuilder).Convert(builderType)
+	emptyValue := emptyBuilderValue.Convert(builderType)
 	return &emptyValue
 }
 
