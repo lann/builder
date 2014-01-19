@@ -13,6 +13,8 @@ type simpleExpr struct {
 	Subtracts  []int
 }
 
+// Start builder definition
+
 type simpleExprBuilder builder.Builder
 
 func (b simpleExprBuilder) Multiplier(i int) simpleExprBuilder {
@@ -38,6 +40,8 @@ func (b simpleExprBuilder) Equals() (total int) {
 // SimpleExprBuilder is an "empty" builder
 var SimpleExprBuilder = builder.Register(
 	simpleExprBuilder{}, simpleExpr{}).(simpleExprBuilder)
+
+// End builder definition
 
 func Example_basic() {
 	b := SimpleExprBuilder.Add(10).Subtract(3)
