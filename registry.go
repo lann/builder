@@ -10,7 +10,6 @@ var registry = make(map[reflect.Type]reflect.Type)
 // Returns a Value containing an empty instance of the registered builderType.
 // RegisterType will panic if builderType's underlying type is not Builder or
 // if structType's Kind is not Struct.
-
 func RegisterType(builderType reflect.Type, structType reflect.Type) *reflect.Value {
 	structType.NumField() // Panic if structType is not a struct
 	registry[builderType] = structType
