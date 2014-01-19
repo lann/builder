@@ -1,12 +1,12 @@
-# Builder - fluent immutable builders
+# Builder - fluent immutable builders for Go
 
 [![GoDoc](https://godoc.org/github.com/lann/builder?status.png)](https://godoc.org/github.com/lann/builder)
 [![Build Status](https://travis-ci.org/lann/builder.png?branch=master)](https://travis-ci.org/lann/builder)
 
-Builder helps you write **fluent** interfaces for your libraries using method chaining:
+Builder helps you write **fluent** DSLs for your libraries with method chaining:
 
 ```go
-req := ReqBuilder.
+resp := ReqBuilder.
     Url("http://golang.org").
     Header("User-Agent", "Builder").
     Get()
@@ -16,19 +16,39 @@ Builder uses **immutable** persistent data structures ([these](https://github.co
 so that each step in your method chain can be reused:
 
 ```go
-build := WordBuilder.Letters("Build")
-builder := build.Letters("er").String()
-building := build.Letters("ing").String()
+build := WordBuilder.AddLetters("Build")
+builder := build.AddLetters("er")
+building := build.AddLetters("ing")
 ```
 
 Builder makes it easy to **build** structs using the **builder** pattern (*surprise!*):
 
 ```go
-muppet := builder.GetStruct(
+import "github.com/lann/builder"
+
+type Muppet struct {
+    Name string
+    Friends []string
+}
+
+type muppetBuilder builder.Builder
+
+func (b muppetBuilder) Name(name string) muppetBuilder {
+    return builder.Set(b, "Name", name).(muppetBuilder)
+}
+
+func (b muppetBuilder) AddFriend(friend string) muppetBuilder {
+    return builder.Append(b, "Friends", friend).(muppetBuilder)
+}
+
+var MuppetBuilder = builder.Register(muppetBuilder{}, Muppet{}).(muppetBuilder)
+```
+```go
+builder.GetStruct(
     MuppetBuilder.
         Name("Beaker").
-        Hair("orange"))
+        AddFriend("Dr. Honeydew"))
 
-muppet.Name == "Beaker"
+Muppet{Name:"Beaker", Friends:[]string{"Dr. Honeydew"}}
 ```
 
