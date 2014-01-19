@@ -74,6 +74,17 @@ func TestAppend(t *testing.T) {
 	}
 }
 
+func TestExtendPanic(t *testing.T) {
+	var panicVal *reflect.ValueError
+	func() {
+		defer func() { panicVal = recover().(*reflect.ValueError) }()
+		builder.Extend(FooBuilder, "Add", Foo{})
+	}()
+	if panicVal == nil {
+		t.Errorf("expected panic, didn't")
+	}
+}
+
 func TestSplitChain(t *testing.T) {
 	b1 := FooBuilder.X(1)
 	b2 := b1.X(2)
