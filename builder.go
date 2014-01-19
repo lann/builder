@@ -8,8 +8,10 @@ import (
 )
 
 // Builder stores a set of named values.
+//
 // New types can be declared with underlying type Builder and used with the
-// functions in this package. See the example.
+// functions in this package. See example.
+//
 // Instances of Builder should be treated as immutable. It is up to the
 // implementor to ensure mutable values set on a Builder are not mutated while
 // the Builder is in use.
@@ -31,6 +33,7 @@ func getBuilderMap(builder interface{}) ps.Map {
 
 // Set returns a copy of the given builder with a new value set for the given
 // name.
+//
 // Set (and all other functions taking a builder in this package) will panic if
 // the given builder's underlying type is not Builder.
 func Set(builder interface{}, name string, v interface{}) interface{} {
@@ -47,8 +50,10 @@ func Append(builder interface{}, name string, vs ...interface{}) interface{} {
 
 // Extend behaves like Append, except it takes a single slice or array value
 // which will be concatenated to the named list.
+//
 // Unlike a variadic call to Append - which requires a []interface{} value -
 // Extend accepts slices or arrays of any type.
+//
 // Extend will panic if the given value is not a slice or array.
 func Extend(builder interface{}, name string, vs interface{}) interface{} {
 	maybeList, ok := getBuilderMap(builder).Lookup(name)

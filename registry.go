@@ -7,7 +7,9 @@ var registry = make(map[reflect.Type]reflect.Type)
 // RegisterType maps the given builderType to a structType.
 // This mapping affects the type of slices returned by Get and is required for
 // GetStruct to work.
+//
 // Returns a Value containing an empty instance of the registered builderType.
+//
 // RegisterType will panic if builderType's underlying type is not Builder or
 // if structType's Kind is not Struct.
 func RegisterType(builderType reflect.Type, structType reflect.Type) *reflect.Value {
@@ -18,6 +20,7 @@ func RegisterType(builderType reflect.Type, structType reflect.Type) *reflect.Va
 }
 
 // Register wraps RegisterType, taking instances instead of Types.
+//
 // Returns an empty instance of the registered builder type which can be used
 // as the initial value for builder expressions. See example.
 func Register(builderProto interface{}, structProto interface{}) interface{} {
