@@ -52,3 +52,7 @@ builder.GetStruct(
 Muppet{Name:"Beaker", Friends:[]string{"Dr. Honeydew"}}
 ```
 
+
+## License
+
+Builder is released under the [MIT License](http://www.opensource.org/licenses/MIT).
