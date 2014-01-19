@@ -13,6 +13,13 @@ type simpleExpr struct {
 	Subtracts  []int
 }
 
+func (e simpleExpr) Equals() (total int) {
+	for _, i := range e.Adds { total += i }
+	for _, i := range e.Subtracts { total -= i }
+	if e.Multiplier != 0 { total *= e.Multiplier }
+	return
+}
+
 // Start builder definition
 
 type simpleExprBuilder builder.Builder
@@ -29,17 +36,13 @@ func (b simpleExprBuilder) Subtract(i int) simpleExprBuilder {
 	return builder.Append(b, "Subtracts", i).(simpleExprBuilder)
 }
 
-func (b simpleExprBuilder) Equals() (total int) {
-	e := builder.GetStruct(b).(simpleExpr)
-	for _, i := range e.Adds { total += i }
-	for _, i := range e.Subtracts { total -= i }
-	if e.Multiplier != 0 { total *= e.Multiplier }
-	return
+func (b simpleExprBuilder) Equals() int {
+	return builder.GetStruct(b).(simpleExpr).Equals()
 }
 
-// SimpleExprBuilder is an "empty" builder
-var SimpleExprBuilder = builder.Register(
-	simpleExprBuilder{}, simpleExpr{}).(simpleExprBuilder)
+// SimpleExprBuilder is an empty builder
+var SimpleExprBuilder =
+	builder.Register(simpleExprBuilder{}, simpleExpr{}).(simpleExprBuilder)
 
 // End builder definition
 
@@ -49,9 +52,9 @@ func Example_basic() {
 	// Intermediate values can be reused
 	b2 := b.Multiplier(2)
 	b3 := b.Multiplier(3)
-	
+
 	fmt.Println(b.Equals(), b2.Equals(), b3.Equals())
 
 	// Output:
-	// 7 14 21 
+	// 7 14 21
 }
