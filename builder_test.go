@@ -94,10 +94,23 @@ func TestSplitChain(t *testing.T) {
 	assertInt(t, b3, "X", 3)
 }
 
+func TestGetMap(t *testing.T) {
+	b := FooBuilder.X(1).Y(2).Add(3).Add(4)
+	m := builder.GetMap(b)
+	expected := map[string]interface{}{
+		"X": 1,
+		"Y": 2,
+		"Add": []int{3, 4},
+	}
+	if !reflect.DeepEqual(m, expected) {
+		t.Errorf("expected %v, got %v", expected, m)
+	}
+}
+
 func TestGetStruct(t *testing.T) {
 	b := FooBuilder.X(1).Y(2).Add(3).Add(4)
 	s := builder.GetStruct(b).(Foo)
-	expected := Foo{1, 2, []int{3, 4}}
+	expected := Foo{X: 1, Y: 2, Add: []int{3, 4}}
 	if !reflect.DeepEqual(s, expected) {
 		t.Errorf("expected %v, got %v", expected, s)
 	}
@@ -115,6 +128,12 @@ func TestUnregisteredBuilder(t *testing.T) {
 
 	x, _ := builder.Get(b, "X")
 	expected := []interface{}{1}
+	if !reflect.DeepEqual(x.([]interface{}), expected) {
+		t.Errorf("expected %v, got %v", expected, x)
+	}
+
+	x = builder.GetMap(b)["X"]
+	expected = []interface{}{1}
 	if !reflect.DeepEqual(x.([]interface{}), expected) {
 		t.Errorf("expected %v, got %v", expected, x)
 	}

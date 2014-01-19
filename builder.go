@@ -94,10 +94,9 @@ var anyArrayType = reflect.TypeOf([]interface{}{})
 // will be a slice. If the given Builder has been registered with Register or
 // RegisterType and the given name is an exported field of the registered
 // struct, the returned slice will have the same type as that field. Otherwise
-// the slice will have type []interface{}.
-//
-// Get will panic if the given name is a registered struct's exported field and
-// the value set on the Builder is not assignable to the field.
+// the slice will have type []interface{}. It will panic if the given name is a
+// registered struct's exported field and the value set on the Builder is not
+// assignable to the field.
 func Get(builder interface{}, name string) (interface{}, bool) {
 	val, ok := getBuilderMap(builder).Lookup(name)
 	if !ok {
@@ -122,6 +121,37 @@ func Get(builder interface{}, name string) (interface{}, bool) {
 	}
 
 	return val, true
+}
+
+// GetMap returns a map[string]interface{} of the values set in the given
+// builder.
+//
+// See notes on Get regarding returned slices.
+func GetMap(builder interface{}) map[string]interface{} {
+	m := getBuilderMap(builder)
+	structType := getBuilderStructType(reflect.TypeOf(builder))
+
+	ret := make(map[string]interface{}, m.Size())
+
+	m.ForEach(func(name string, val ps.Any) {
+		list, isList := val.(ps.List)
+		if isList {
+			arrayType := anyArrayType
+
+			if structType != nil {
+				field, ok := (*structType).FieldByName(name)
+				if ok {
+					arrayType = field.Type
+				}
+			}
+
+			val = listToSlice(list, arrayType).Interface()
+		}
+
+		ret[name] = val
+	})
+
+	return ret
 }
 
 // GetStruct builds a new struct from the given registered builder.
