@@ -57,6 +57,14 @@ func TestBuilder(t *testing.T) {
 	}
 }
 
+func TestDelete(t *testing.T) {
+	b := builder.Delete(FooBuilder.X(1), "X")
+	_, ok := builder.Get(b, "X")
+	if ok {
+		t.Fatalf("key %v not deleted", "X")
+	}
+}
+
 func TestAppend(t *testing.T) {
 	b := FooBuilder.Add(1).Add(2)
 	v, ok := builder.Get(b, "Add")
@@ -71,6 +79,14 @@ func TestAppend(t *testing.T) {
 	j := a[1]
 	if i != 1 || j != 2 {
 		t.Errorf("expected [1, 2], got [%d, %d]", i, j)
+	}
+}
+
+func TestExtendNil(t *testing.T) {
+	b := builder.Extend(FooBuilder, "Add", nil)
+	_, ok := builder.Get(b, "X")
+	if ok {
+		t.Fatalf("key %v set unexpectedly", "Add")
 	}
 }
 

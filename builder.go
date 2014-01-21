@@ -41,6 +41,12 @@ func Set(builder interface{}, name string, v interface{}) interface{} {
 	return convert(b, builder)
 }
 
+// Delete returns a copy of the given builder with the given named value unset.
+func Delete(builder interface{}, name string) interface{} {
+	b := Builder{getBuilderMap(builder).Delete(name)}
+	return convert(b, builder)
+}
+
 // Append returns a copy of the given builder with new value(s) appended to the
 // named list. If the value was previously unset or set with Set (even to a e.g.
 // slice values), the new value(s) will be appended to an empty list.
@@ -54,8 +60,12 @@ func Append(builder interface{}, name string, vs ...interface{}) interface{} {
 // Unlike a variadic call to Append - which requires a []interface{} value -
 // Extend accepts slices or arrays of any type.
 //
-// Extend will panic if the given value is not a slice or array.
+// Extend will panic if the given value is not a slice, array, or nil.
 func Extend(builder interface{}, name string, vs interface{}) interface{} {
+	if vs == nil {
+		return builder
+	}
+
 	maybeList, ok := getBuilderMap(builder).Lookup(name)
 
 	var list ps.List
