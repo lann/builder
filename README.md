@@ -12,7 +12,8 @@ resp := ReqBuilder.
     Get()
 ```
 
-Builder uses **immutable** persistent data structures ([these](https://github.com/mndrix/ps), specifically)
+Builder uses **immutable** persistent data structures
+([these](https://github.com/mndrix/ps), specifically)
 so that each step in your method chain can be reused:
 
 ```go
@@ -21,7 +22,8 @@ builder := build.AddLetters("er")
 building := build.AddLetters("ing")
 ```
 
-Builder makes it easy to **build** structs using the **builder** pattern (*surprise!*):
+Builder makes it easy to **build** structs using the **builder** pattern
+(*surprise!*):
 
 ```go
 import "github.com/lann/builder"
@@ -41,18 +43,23 @@ func (b muppetBuilder) AddFriend(friend string) muppetBuilder {
     return builder.Append(b, "Friends", friend).(muppetBuilder)
 }
 
+func (b muppetBuilder) Build() Muppet {
+    return builder.GetStruct(b).(Muppet)
+}
+
 var MuppetBuilder = builder.Register(muppetBuilder{}, Muppet{}).(muppetBuilder)
 ```
 ```go
-builder.GetStruct(
-    MuppetBuilder.
-        Name("Beaker").
-        AddFriend("Dr. Honeydew"))
+MuppetBuilder.
+    Name("Beaker").
+    AddFriend("Dr. Honeydew").
+    Build()
 
-Muppet{Name:"Beaker", Friends:[]string{"Dr. Honeydew"}}
+=> Muppet{Name:"Beaker", Friends:[]string{"Dr. Honeydew"}}
 ```
 
 
 ## License
 
-Builder is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+Builder is released under the
+[MIT License](http://www.opensource.org/licenses/MIT).
