@@ -19,7 +19,10 @@ type Builder struct {
 	builderMap ps.Map
 }
 
-var emptyBuilderValue = reflect.ValueOf(Builder{ps.NewMap()})
+var (
+	EmptyBuilder = Builder{ps.NewMap()}
+	emptyBuilderValue = reflect.ValueOf(EmptyBuilder)
+)
 
 func getBuilderMap(builder interface{}) ps.Map {
 	b := convert(builder, Builder{}).(Builder)
