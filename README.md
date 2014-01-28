@@ -3,6 +3,10 @@
 [![GoDoc](https://godoc.org/github.com/lann/builder?status.png)](https://godoc.org/github.com/lann/builder)
 [![Build Status](https://travis-ci.org/lann/builder.png?branch=master)](https://travis-ci.org/lann/builder)
 
+Builder was originally written for
+[Squirrel](https://github.com/lann/squirrel), a fluent SQL generator. It
+is probably the best example of Builder in action.
+
 Builder helps you write **fluent** DSLs for your libraries with method chaining:
 
 ```go
@@ -57,7 +61,6 @@ MuppetBuilder.
 
 => Muppet{Name:"Beaker", Friends:[]string{"Dr. Honeydew"}}
 ```
-
 
 ## License
 
