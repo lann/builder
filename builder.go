@@ -173,7 +173,7 @@ func GetMap(builder interface{}) map[string]interface{} {
 //
 // All values set on the builder with names that start with an uppercase letter
 // (i.e. which would be exported if they were identifiers) are assigned to the
-// corresponding exported fields of a new struct.
+// corresponding exported fields of the struct.
 //
 // GetStruct will panic if any of these "exported" values are not assignable to
 // their corresponding struct fields.
@@ -182,7 +182,24 @@ func GetStruct(builder interface{}) interface{} {
 	if structVal == nil {
 		return nil
 	}
+	return scanStruct(builder, structVal)
+}
 
+// GetStructLike builds a new struct from the given builder with the same type
+// as the given struct.
+//
+// All values set on the builder with names that start with an uppercase letter
+// (i.e. which would be exported if they were identifiers) are assigned to the
+// corresponding exported fields of the struct.
+//
+// ScanStruct will panic if any of these "exported" values are not assignable to
+// their corresponding struct fields.
+func GetStructLike(builder interface{}, strct interface{}) interface{} {
+	structVal := reflect.New(reflect.TypeOf(strct)).Elem()
+	return scanStruct(builder, &structVal)
+}
+
+func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {
 	getBuilderMap(builder).ForEach(func(name string, val ps.Any) {
 		if ast.IsExported(name) {
 			field := structVal.FieldByName(name)

@@ -132,6 +132,15 @@ func TestGetStruct(t *testing.T) {
 	}
 }
 
+func TestGetStructLike(t *testing.T) {
+	b := FooBuilder.X(1).Y(2).Add(3).Add(4)
+	s := builder.GetStructLike(b, Foo{}).(Foo)
+	expected := Foo{X: 1, Y: 2, Add: []int{3, 4}}
+	if !reflect.DeepEqual(s, expected) {
+		t.Errorf("expected %v, got %v", expected, s)
+	}
+}
+
 func TestZeroBuilder(t *testing.T) {
 	f := builder.GetStruct(fooBuilder{}.X(1)).(Foo)
 	if f.X != 1 {
