@@ -2,9 +2,9 @@
 package builder
 
 import (
+	"github.com/mndrix/ps"
 	"go/ast"
 	"reflect"
-	"github.com/mndrix/ps"
 )
 
 // Builder stores a set of named values.
@@ -20,7 +20,7 @@ type Builder struct {
 }
 
 var (
-	EmptyBuilder = Builder{ps.NewMap()}
+	EmptyBuilder      = Builder{ps.NewMap()}
 	emptyBuilderValue = reflect.ValueOf(EmptyBuilder)
 )
 
@@ -89,7 +89,7 @@ func Extend(builder interface{}, name string, vs interface{}) interface{} {
 func listToSlice(list ps.List, arrayType reflect.Type) reflect.Value {
 	size := list.Size()
 	slice := reflect.MakeSlice(arrayType, size, size)
-	for i := size - 1; i >= 0; i--  {
+	for i := size - 1; i >= 0; i-- {
 		val := reflect.ValueOf(list.Head())
 		slice.Index(i).Set(val)
 		list = list.Tail()
@@ -204,12 +204,20 @@ func scanStruct(builder interface{}, structVal *reflect.Value) interface{} {
 		if ast.IsExported(name) {
 			field := structVal.FieldByName(name)
 
-			list, isList := val.(ps.List)
-			if isList {
-				val = listToSlice(list, field.Type()).Interface()
+			var value reflect.Value
+			switch v := val.(type) {
+			case nil:
+				switch field.Kind() {
+				case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
+					value = reflect.Zero(field.Type())
+				}
+				// nil is not valid for this Type; Set will panic
+			case ps.List:
+				value = listToSlice(v, field.Type())
+			default:
+				value = reflect.ValueOf(val)
 			}
-
-			field.Set(reflect.ValueOf(val))
+			field.Set(value)
 		}
 	})
 

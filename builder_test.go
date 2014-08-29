@@ -1,14 +1,15 @@
 package builder_test
 
 import (
+	"github.com/lann/builder"
 	"reflect"
 	"testing"
-	"github.com/lann/builder"
 )
 
 type Foo struct {
-	X    int
-	Y    int
+	X   int
+	Y   int
+	I   interface{}
 	Add []int
 }
 
@@ -20,6 +21,10 @@ func (b fooBuilder) X(i int) fooBuilder {
 
 func (b fooBuilder) Y(i int) fooBuilder {
 	return builder.Set(b, "Y", i).(fooBuilder)
+}
+
+func (b fooBuilder) I(i interface{}) fooBuilder {
+	return builder.Set(b, "I", i).(fooBuilder)
 }
 
 func (b fooBuilder) Add(i int) fooBuilder {
@@ -34,7 +39,7 @@ func (b unregBuilder) Add(i int) unregBuilder {
 	return builder.Append(b, "X", i).(unregBuilder)
 }
 
-func assertInt(t *testing.T, b fooBuilder, key string, val int)  {
+func assertInt(t *testing.T, b fooBuilder, key string, val int) {
 	v, ok := builder.Get(b, key)
 	if !ok {
 		t.Errorf("key %v not set", key)
@@ -114,8 +119,8 @@ func TestGetMap(t *testing.T) {
 	b := FooBuilder.X(1).Y(2).Add(3).Add(4)
 	m := builder.GetMap(b)
 	expected := map[string]interface{}{
-		"X": 1,
-		"Y": 2,
+		"X":   1,
+		"Y":   2,
 		"Add": []int{3, 4},
 	}
 	if !reflect.DeepEqual(m, expected) {
@@ -166,5 +171,22 @@ func TestUnregisteredBuilder(t *testing.T) {
 	s := builder.GetStruct(b)
 	if s != nil {
 		t.Errorf("expected nil, got %v", s)
+	}
+}
+
+func TestSetNil(t *testing.T) {
+	b := FooBuilder.I(nil)
+	builder.GetStruct(b)
+}
+
+func TestSetInvalidNil(t *testing.T) {
+	var panicVal interface{}
+	func() {
+		defer func() { panicVal = recover() }()
+		b := builder.Set(FooBuilder, "X", nil)
+		builder.GetStruct(b)
+	}()
+	if panicVal == nil {
+		t.Errorf("expected panic, didn't")
 	}
 }
