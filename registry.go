@@ -1,8 +1,11 @@
 package builder
 
-import "reflect"
+import (
+	"reflect"
+	"sync"
+)
 
-var registry = make(map[reflect.Type]reflect.Type)
+var registry sync.Map
 
 // RegisterType maps the given builderType to a structType.
 // This mapping affects the type of slices returned by Get and is required for
@@ -12,9 +15,9 @@ var registry = make(map[reflect.Type]reflect.Type)
 //
 // RegisterType will panic if builderType's underlying type is not Builder or
 // if structType's Kind is not Struct.
-func RegisterType(builderType reflect.Type, structType reflect.Type) *reflect.Value {
+func RegisterType(builderType, structType reflect.Type) *reflect.Value {
 	structType.NumField() // Panic if structType is not a struct
-	registry[builderType] = structType
+	registry.Store(builderType, structType)
 	emptyValue := emptyBuilderValue.Convert(builderType)
 	return &emptyValue
 }
@@ -32,10 +35,12 @@ func Register(builderProto interface{}, structProto interface{}) interface{} {
 }
 
 func getBuilderStructType(builderType reflect.Type) *reflect.Type {
-	structType, ok := registry[builderType]
+	t, ok := registry.Load(builderType)
 	if !ok {
 		return nil
 	}
+
+	structType := t.(reflect.Type)
 	return &structType
 }
 
